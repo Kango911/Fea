@@ -1,25 +1,24 @@
-def compress_string(s):
-    if not s:
-        return ""
+import pandas as pd
+import matplotlib.pyplot as plt
 
-    compressed = []
-    count = 1
-    previous_char = s[0]
+# Загружаем файл bitcoin.csv
+df = pd.read_csv('bitcoin.csv')
 
-    for char in s[1:]:
-        if char == previous_char:
-            count += 1
-        else:
-            compressed.append(f"{count}{previous_char}")
-            previous_char = char
-            count = 1
+# Вычисляем медианную цену
+df['Median Price'] = (df['Open'] + df['High'] + df['Low']) / 3
 
-    compressed.append(f"{count}{previous_char}")
+# Строим график медианной цены и цены закрытия
+plt.figure(figsize=(12, 6))
+plt.plot(df['Date'], df['Close'], label='Closing Price')
+plt.plot(df['Date'], df['Median Price'], label='Median Price')
+plt.xlabel('Date')
+plt.ylabel('Price (USD)')
+plt.title('Bitcoin Closing Price vs. Median Price')
+plt.legend()
+plt.grid(True)
+plt.show()
 
-    return ''.join(compressed)
-
-
-# Пример использования
-input_string = input(f'Введите значение:\n')
-compressed_string = compress_string(input_string)
-print(compressed_string)
+# Выводим даты, когда максимальная цена была больше медианной на 4%
+high_price_dates = df[df['High'] > 1.04 * df['Median Price']]['Date']
+print("Dates when High price was greater than Median price by 4%:")
+print(high_price_dates.to_string(index=False))
